@@ -1,55 +1,49 @@
 const router = require("express").Router();
-const e = require("express");
-const db = require("../models");
+const Workout = require('../models/Workouts')
 
-router.get("/api/workouts", (req, res) => {
-    db.Workout.find({})
-    .then(dbWorkout => {
-      dbWorkout.forEach(workout => {
-        var total = 0;
-        workout.exercises.forEach(e => {
-          total += e.duration;
-        });
-        workout.totalDuration = total;
-      });
-      res.status(200).json(dbWorkout);
-    }).catch(err => {
-      res.status(500).json(err);
-    });
+router.get("/workouts", async (req, res) => {
+    try {
+        const workoutData = await Workout.find({}).sort({ date: -1 });
+        res.status(200).json(workoutData);
+      } catch (err) {
+        res.status(500).json(err);
+      }
 }); 
 
-router.put("/api/workouts/:id", (req, res) => {
-    db.Workout.findOneAndUpdate(
-        { _id: req.params.id },
+router.put("/workouts/:id", async (req, res) => {
+    try {
+    const workoutData = await  Workout.updateOne(
         {
-            $inc: { totalDuration: req.body.duration },
-            $push: { exercises: req.body }
+            _id: params.id
         },
-        { new: true }
-    ).then(dbWorkout => {
-        res.status(200).json(dbWorkout);
-    }).catch(err => {
+        {
+            $push: {
+                exercise: body
+            }
+        });
+    
+        res.status(200).json(workoutData);
+    } catch (err) {
         res.status(500).json(err);
-    });
+    }
 });
 
-router.post("/api/workouts", (req, res) => {
-    db.Workout.create(body)
-    .then(dbWorkout => {
-        res.status(200).json(dbWorkout);
-    }).catch(err => {
-        res.status(500).json(err)
-    });
-});
-
-router.get("/api/workouts/range", (req, res) => {
-    db.Workout.find({})
-    .then(dbWorkout => {
-        res.status(200).json(dbWorkout);
-    }).catch(err => {
+router.post("/workouts", async (req, res) => {
+    try {
+        const workoutData = await Workout.create(body);
+        res.status(200).json(workoutData);
+    } catch (err) {
         res.status(500).json(err);
-    });
+    }
 });
 
+router.get("/workouts/range", async (req, res) => {
+    try {
+        const workoutData = await Workout.find({}).sort({ date: -1 });
+        res.status(200).json(workoutData);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+});
 
 module.exports = router;
