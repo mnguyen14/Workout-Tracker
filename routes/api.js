@@ -1,72 +1,54 @@
 const router = require("express").Router();
-const Workout = require("../models/workouts");
-const path = require("path");
-
-router.get("/", (req,  res) => {
-    res.sendFile(path.join(__dirname, "../public/index.html"));
-});
-
-router.get("/exercise", (req, res) => {
-    res.sendFile(path.join(__dirname, "../public/exercise.html"));
-});
-
-router.get("/stats", (req, res) => {
-    res.sendFile(path.join(__dirname, "../public/stats.html"));
-});
+const e = require("express");
+const db = require("../models");
 
 router.get("/api/workouts", (req, res) => {
-    Workout.find({})
-    .then(data => {
-        res.json(data);
-        })
-        .catch (err => {
-            res.status(400).json(err);
+    db.Workout.find({})
+    .then(dbWorkout => {
+      dbWorkout.forEach(workout => {
+        var total = 0;
+        workout.exercises.forEach(e => {
+          total += e.duration;
         });
-});
+        workout.totalDuration = total;
+      });
+      res.status(200).json(dbWorkout);
+    }).catch(err => {
+      res.status(500).json(err);
+    });
+}); 
 
 router.put("/api/workouts/:id", (req, res) => {
-    Workout.findByIdAndUpdate(
-        req.params.id, {
-            $push: {
-                exercise: req.body
-            }
-        }, {
-            new: true,
-            runValidators: true
-        }
-    )
-    .then(data => {
-        res.json(data);
-        })
-        .catch (err => {
-            res.status(400).json(err);
-        });
-})
+    db.Workout.findOneAndUpdate(
+        { _id: req.params.id },
+        {
+            $inc: { totalDuration: req.body.duration },
+            $push: { exercises: req.body }
+        },
+        { new: true }
+    ).then(dbWorkout => {
+        res.status(200).json(dbWorkout);
+    }).catch(err => {
+        res.status(500).json(err);
+    });
+});
 
 router.post("/api/workouts", (req, res) => {
-    Workout.create({})
-    .then(data => {
-    res.json(data);
-    })
-    .catch (err => {
-        res.status(400).json(err);
+    db.Workout.create(body)
+    .then(dbWorkout => {
+        res.status(200).json(dbWorkout);
+    }).catch(err => {
+        res.status(500).json(err)
     });
 });
 
 router.get("/api/workouts/range", (req, res) => {
-    Workout.aggregate([{
-        $addFields: {
-            totalDuration: {
-                $sum: "$exercise.duration"
-            }
-        }
-    }])
-    .then(data => {
-        res.json(data);
-        })
-        .catch (err => {
-            res.status(400).json(err);
-        });
+    db.Workout.find({})
+    .then(dbWorkout => {
+        res.status(200).json(dbWorkout);
+    }).catch(err => {
+        res.status(500).json(err);
+    });
 });
 
 
