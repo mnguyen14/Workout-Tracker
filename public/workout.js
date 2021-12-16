@@ -20,17 +20,19 @@ async function initWorkout() {
 }
 
 function tallyExercises(exercises) {
-  const tallied = exercises.reduce((acc, curr) => {
-    if (curr.type === "resistance") {
-      acc.totalWeight = (acc.totalWeight || 0) + curr.weight;
-      acc.totalSets = (acc.totalSets || 0) + curr.sets;
-      acc.totalReps = (acc.totalReps || 0) + curr.reps;
-    } else if (curr.type === "cardio") {
-      acc.totalDistance = (acc.totalDistance || 0) + curr.distance;
+  const sum = exercises.reduce((total, current) => {
+    if (current.type == "resistance") {
+      total.totalWeight = (total.totalWeight || 0) + current.weight;
+      total.totalSets = (total.totalSets || 0) + current.sets;
+      total.totalReps = (total.totalReps || 0) + current.reps;
+      total.totalDuration = (total.totalDuration || 0) + current.duration;
+    } else if (current.type === "cardio") {
+      total.totalDistance = (total.totalDistance || 0) + current.distance;
+      total.totalDuration = (total.totalDuration || 0) + current.duration;
     }
-    return acc;
+    return total;
   }, {});
-  return tallied;
+  return sum;
 }
 
 function formatDate(date) {
