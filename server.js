@@ -82,7 +82,6 @@ app.get("/api/workouts/range", (req, res) =>{
   });
 });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}!`);
 });
