@@ -25,11 +25,11 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/workout", {
 );
 
 app.get("/exercise", (req, res)=>{
-  res.sendFile(path.join(__dirname, 'public', 'exercise.html'))
+  res.sendFile(path.join(__dirname, 'public', '../public/exercise.html'));
 });
 
 app.get("/stats", (req, res)=>{
-  res.sendFile(path.join(__dirname, 'public', 'stats.html'))
+  res.sendFile(path.join(__dirname, 'public', '../public/stats.html'));
 });
 
 app.post("/api/workouts", ({body}, res)=>{
